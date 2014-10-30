@@ -590,9 +590,6 @@ class WordpressReadOnly extends WordpressReadOnlyGeneric {
 
 		if (substr($filename, 0, strlen($this->tempdir)) != $this->tempdir) return false;
 		$filename = substr($filename, strlen($this->tempdir));
-		if (!preg_match('/^wpro[0-9]+(\/.+)$/', $filename, $regs)) return false;
-
-		$filename = $regs[1];
 
 		$tmpfile = $this->tempdir . 'wpro' . time() . rand(0, 999999);
 		while (file_exists($tmpfile)) $tmpfile = $this->tempdir . 'wpro' . time() . rand(0, 999999);
