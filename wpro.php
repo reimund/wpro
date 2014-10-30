@@ -595,18 +595,27 @@ class WordpressReadOnly extends WordpressReadOnlyGeneric {
 		while (file_exists($tmpfile)) $tmpfile = $this->tempdir . 'wpro' . time() . rand(0, 999999);
 		$this->debug('-> Storing image as temporary file: ' . $tmpfile);
 
-		switch ($mime_type) {
-			case 'image/jpeg':
-				imagejpeg($image, $tmpfile, apply_filters('jpeg_quality', 90, 'edit_image'));
-				break;
-			case 'image/png':
-				imagepng($image, $tmpfile);
-				break;
-			case 'image/gif':
-				imagegif($image, $tmpfile);
-				break;
-			default:
-				return false;
+		if (is_a($image, 'WP_Image_Editor'))
+		{
+			$saved_image = $image->save($tmpfile, $mime_type);
+			$tmpfile = $saved_image['path'];
+			$this->debug('-> $image->save() returned: ' . print_r($ret, true));
+		}
+		else
+		{
+			switch ($mime_type) {
+				case 'image/jpeg':
+					imagejpeg($image, $tmpfile, apply_filters('jpeg_quality', 90, 'edit_image'));
+					break;
+				case 'image/png':
+					imagepng($image, $tmpfile);
+					break;
+				case 'image/gif':
+					imagegif($image, $tmpfile);
+					break;
+				default:
+					return false;
+			}
 		}
 
 		$upload = wp_upload_dir();
