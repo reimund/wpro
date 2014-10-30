@@ -586,7 +586,7 @@ class WordpressReadOnly extends WordpressReadOnlyGeneric {
 
 	function save_image_file($dummy, $filename, $image, $mime_type, $post_id) {
 
-		$this->debug('WordpressReadOnly::save_image_file("' . $dummy . '", "' . $filename . '", "' . $image . '", "' . $mime_type . '", "' . $post_id . '");');
+		$this->debug('WordpressReadOnly::save_image_file("' . $dummy . '", "' . $filename . '", "' . $mime_type . '", "' . $post_id . '");');
 
 		if (substr($filename, 0, strlen($this->tempdir)) != $this->tempdir) return false;
 		$filename = substr($filename, strlen($this->tempdir));
