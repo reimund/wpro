@@ -508,9 +508,9 @@ class WordpressReadOnly extends WordpressReadOnlyGeneric {
 			break;
 		default:
 			if (wpro_get_option('wpro-aws-virthost')) {
-				$data['baseurl'] = 'http://' . trim(str_replace('//', '/', wpro_get_option('wpro-aws-bucket') . '/' . trim(wpro_get_option('wpro-folder'))), '/');
+				$data['baseurl'] = 'https://' . trim(str_replace('//', '/', wpro_get_option('wpro-aws-bucket') . '/' . trim(wpro_get_option('wpro-folder'))), '/');
 			} else {
-				$data['baseurl'] = 'http://' . trim(str_replace('//', '/', wpro_get_option('wpro-aws-bucket') . '.s3.amazonaws.com/' . trim(wpro_get_option('wpro-folder'))), '/');
+				$data['baseurl'] = 'https://' . trim(str_replace('//', '/', wpro_get_option('wpro-aws-bucket') . '.s3.amazonaws.com/' . trim(wpro_get_option('wpro-folder'))), '/');
 			}
 		}
 		$data['path'] = $this->upload_basedir . $data['subdir'];
