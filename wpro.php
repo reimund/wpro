@@ -181,7 +181,7 @@ class WordpressReadOnlyS3 extends WordpressReadOnlyBackend {
 	function upload($file, $fullurl, $mime) {
 		$this->debug('WordpressReadOnlyS3::upload("' . $file . '", "' . $fullurl . '", "' . $mime . '");');
 		$fullurl = $this->url_normalizer($fullurl);
-		if (!preg_match('/^http:\/\/([^\/]+)\/(.*)$/', $fullurl, $regs)) return false;
+		if (!preg_match('/^https?:\/\/([^\/]+)\/(.*)$/', $fullurl, $regs)) return false;
 		$url = $regs[2];
 
 		if (!file_exists($file)) return false;
