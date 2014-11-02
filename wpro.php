@@ -209,6 +209,7 @@ class WordpressReadOnlyS3 extends WordpressReadOnlyBackend {
 		$query .= "Connection: keep-alive\n";
 		$query .= "Content-Type: " . $mime . "\n";
 		$query .= "Content-Length: " . filesize($file) . "\n";
+		$query .= "Cache-Control: public; max-age=2592000\n";
 		$query .= "Date: " . $datetime . "\n";
 		$query .= "Authorization: AWS " . $this->key . ":" . $this->amazon_hmac($string2sign) . "\n\n";
 
