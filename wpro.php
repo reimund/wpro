@@ -509,7 +509,7 @@ class WordpressReadOnly extends WordpressReadOnlyGeneric {
 			break;
 		default:
 			if (wpro_get_option('wpro-aws-virthost')) {
-				$data['baseurl'] = 'https://' . trim(str_replace('//', '/', wpro_get_option('wpro-aws-bucket') . '/' . trim(wpro_get_option('wpro-folder'))), '/');
+				$data['baseurl'] = 'http://' . trim(str_replace('//', '/', wpro_get_option('wpro-aws-bucket') . '/' . trim(wpro_get_option('wpro-folder'))), '/');
 			} else {
 				$data['baseurl'] = 'https://' . trim(str_replace('//', '/', wpro_get_option('wpro-aws-bucket') . '.s3.amazonaws.com/' . trim(wpro_get_option('wpro-folder'))), '/');
 			}
