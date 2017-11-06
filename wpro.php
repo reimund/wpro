@@ -193,7 +193,13 @@ class WordpressReadOnlyS3 extends WordpressReadOnlyBackend {
 		$fout = fsockopen($this->endpoint, 80, $errno, $errstr, 30);
 		if (!$fout) return false;
 		$datetime = gmdate('r');
-		$string2sign = "PUT\n\n" . $mime . "\n" . $datetime . "\nx-amz-acl:public-read\n/" . $this->bucket . "/" . $url;
+
+		$filePath = $this->bucket . "/" . $url;
+		if (!wpro_get_option('wpro-aws-virthost') && strpos($url, $this->bucket) === 0) {
+			$filePath = $url;
+		}
+
+		$string2sign = "PUT\n\n" . $mime . "\n" . $datetime . "\nx-amz-acl:public-read\n/" . $filePath;
 
 		$this->debug('STRING TO SIGN:');
 		$this->debug($string2sign);
@@ -203,7 +209,7 @@ class WordpressReadOnlyS3 extends WordpressReadOnlyBackend {
 
 		// Todo: Make this work with php cURL instead of fsockopen/etc..
 
-		$query = "PUT /" . $this->bucket . "/" . $url . " HTTP/1.1\n";
+		$query = "PUT /" . $filePath . " HTTP/1.1\n";
 		$query .= "Host: " . $this->endpoint . "\n";
 		$query .= "x-amz-acl: public-read\n";
 		$query .= "Connection: keep-alive\n";
