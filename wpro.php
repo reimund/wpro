@@ -177,6 +177,7 @@ class WordpressReadOnlyS3 extends WordpressReadOnlyBackend {
 		$this->bucket = wpro_get_option('wpro-aws-bucket');
 		$this->endpoint = wpro_get_option('wpro-aws-endpoint');
 		$this->ssl = wpro_get_option('wpro-aws-ssl');
+		$this->cloudfront = wpro_get_option('wpro-aws-cloudfront');
 	}
 
 	function upload($file, $fullurl, $mime) {
@@ -328,6 +329,7 @@ class WordpressReadOnly extends WordpressReadOnlyGeneric {
 		add_site_option('wpro-aws-virthost', '');
 		add_site_option('wpro-aws-ssl', '');
 		add_site_option('wpro-aws-endpoint', '');
+		add_site_option('wpro-aws-cloudfront', '');
 		add_site_option('wpro-ftp-server', '');
 		add_site_option('wpro-ftp-user', '');
 		add_site_option('wpro-ftp-password', '');
@@ -351,7 +353,7 @@ class WordpressReadOnly extends WordpressReadOnlyGeneric {
 		// This is because the Settings API has no way of storing network wide options in multisite installs.
 		if (!$this->is_trusted()) return false;
 		if ($_POST['action'] != 'wpro_settings_POST') return false;
-		foreach (array('wpro-service', 'wpro-folder', 'wpro-aws-key', 'wpro-aws-secret', 'wpro-aws-bucket', 'wpro-aws-virthost', 'wpro-aws-ssl', 'wpro-aws-endpoint', 'wpro-ftp-server', 'wpro-ftp-user', 'wpro-ftp-password', 'wpro-ftp-pasvmode') as $allowedPostData) {
+		foreach (array('wpro-service', 'wpro-folder', 'wpro-aws-key', 'wpro-aws-secret', 'wpro-aws-bucket', 'wpro-aws-virthost', 'wpro-aws-ssl', 'wpro-aws-endpoint', 'wpro-aws-cloudfront', 'wpro-ftp-server', 'wpro-ftp-user', 'wpro-ftp-password', 'wpro-ftp-pasvmode') as $allowedPostData) {
 			$data = false;
 			if (isset($_POST[$allowedPostData])) $data = stripslashes($_POST[$allowedPostData]);
 			update_site_option($allowedPostData, $data);
@@ -433,6 +435,12 @@ class WordpressReadOnly extends WordpressReadOnlyGeneric {
 								<th><label for="wpro-aws-ssl">SSL</label></th> 
 								<td>
 									<input name="wpro-aws-ssl" id="wpro-aws-ssl" type="checkbox" value="1" <?php if (wpro_get_option('wpro-aws-ssl')) echo('checked="checked"'); ?> /> Use https protocol in urls.
+								</td>
+							</tr>
+							<tr>
+								<th><label for="wpro-aws-cloudfront">CloudFront domain name</label></th> 
+								<td>
+									<input name="wpro-aws-cloudfront" id="wpro-aws-cloudfront" type="text" value="<?php echo wpro_get_option('wpro-aws-cloudfront'); ?>" class="regular-text code" /><br>Leave empty if CloudFront is not used.
 								</td>
 							</tr>
 							<tr>
@@ -522,11 +530,24 @@ class WordpressReadOnly extends WordpressReadOnlyGeneric {
 			$data['baseurl'] = 'http://' . trim(str_replace('//', '/', trim(wpro_get_option('wpro-ftp-webroot'), '/') . '/' . trim(wpro_get_option('wpro-folder'))), '/');
 			break;
 		default:
-			if (wpro_get_option('wpro-aws-virthost')) {
-				$data['baseurl'] = (wpro_get_option('wpro-aws-ssl') ? 'https' : 'http') . '://' . trim(str_replace('//', '/', wpro_get_option('wpro-aws-bucket') . '/' . trim(wpro_get_option('wpro-folder'))), '/');
-			} else {
-				$data['baseurl'] = 'https://' . wpro_get_option('wpro-aws-endpoint') . '/' . trim(str_replace('//', '/', wpro_get_option('wpro-aws-bucket') . trim(wpro_get_option('wpro-folder'))), '/');
+			if (empty(wpro_get_option('wpro-aws-cloudfront'))) {
+				if (wpro_get_option('wpro-aws-virthost')) {
+					$domain = wpro_get_option('wpro-aws-bucket');
+					$path = wpro_get_option('wpro-folder');
+				}
+				else {
+					$domain = wpro_get_option('wpro-aws-endpoint');
+					$path = wpro_get_option('wpro-aws-bucket') . '/' . wpro_get_option('wpro-folder');
+				}
 			}
+			else {
+				$domain = wpro_get_option('wpro-aws-cloudfront');
+				$path = wpro_get_option('wpro-folder');
+			}
+
+			$protocol = wpro_get_option('wpro-aws-ssl') ? 'https' : 'http';
+
+			$data['baseurl'] = $protocol . '://' . trim(str_replace('//', '/', $domain . '/' . $path), '/');
 		}
 		$data['path'] = $this->upload_basedir . $data['subdir'];
 		$data['url'] = $data['baseurl'] . $data['subdir'];
